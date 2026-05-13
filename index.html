@@ -9,205 +9,188 @@
   :root {
     --bg: #ffffff; --bg2: #f5f5f3;
     --text: #1a1a18; --text2: #6b6b67; --text3: #9b9b96;
-    --border: rgba(0,0,0,0.1); --border2: rgba(0,0,0,0.2);
-    --radius: 8px; --radius-lg: 12px;
+    --border: rgba(0,0,0,0.08); --border2: rgba(0,0,0,0.15);
     --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   }
   @media (prefers-color-scheme: dark) {
     :root {
       --bg: #1c1c1a; --bg2: #252523;
       --text: #f0efe9; --text2: #9b9b96; --text3: #6b6b67;
-      --border: rgba(255,255,255,0.1); --border2: rgba(255,255,255,0.2);
+      --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.15);
     }
   }
-  body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; }
-  header { display: flex; align-items: center; justify-content: space-between; padding: 14px 24px; border-bottom: 0.5px solid var(--border); }
-  header h1 { font-size: 15px; font-weight: 500; }
-  .header-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
-  .legend { display: flex; gap: 14px; flex-wrap: wrap; padding: 10px 24px; border-bottom: 0.5px solid var(--border); background: var(--bg2); }
-  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text2); }
-  .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
-  .schedule-wrap { overflow: auto; padding: 16px 20px 60px; }
-  .grid-header { display: grid; grid-template-columns: 56px repeat(5, 1fr); position: sticky; top: 0; background: var(--bg); z-index: 10; border-bottom: 0.5px solid var(--border); padding-bottom: 8px; }
-  .day-header { text-align: center; padding: 4px 0; }
-  .day-name { font-size: 13px; font-weight: 500; }
-  .day-hours { font-size: 11px; color: var(--text2); margin-top: 1px; }
-  .grid-body { display: grid; grid-template-columns: 56px repeat(5, 1fr); }
-  .time-col { position: relative; }
-  .tick { position: absolute; right: 6px; font-size: 10px; color: var(--text3); transform: translateY(-50%); white-space: nowrap; }
-  .day-col { position: relative; border-left: 0.5px solid var(--border); }
-  .hour-line { position: absolute; left: 0; right: 0; height: 0.5px; background: var(--border); pointer-events: none; }
-  .half-line { position: absolute; left: 0; right: 0; height: 0.5px; background: var(--border); opacity: 0.35; pointer-events: none; }
-  .task-block { position: absolute; left: 3px; right: 3px; border-radius: var(--radius); padding: 4px 7px; overflow: hidden; }
-  .block-name { font-size: 10px; font-weight: 500; line-height: 1.3; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
-  .block-time { font-size: 9px; margin-top: 2px; opacity: 0.7; }
+  body { font-family: var(--font); background: var(--bg); color: var(--text); }
+  header { padding: 12px 20px; border-bottom: 0.5px solid var(--border2); }
+  header h1 { font-size: 14px; font-weight: 500; }
+  .sub { font-size: 11px; color: var(--text2); margin-top: 2px; }
+  .legend { display: flex; gap: 12px; flex-wrap: wrap; padding: 8px 20px; border-bottom: 0.5px solid var(--border2); background: var(--bg2); }
+  .li { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text2); }
+  .ld { width: 9px; height: 9px; border-radius: 2px; flex-shrink: 0; }
+  .wrap { overflow: auto; }
+  .outer { min-width: 700px; padding: 0 16px 40px; }
+  .gh { display: grid; grid-template-columns: 44px repeat(5, 1fr); border-bottom: 0.5px solid var(--border2); padding: 6px 0 6px; position: sticky; top: 0; background: var(--bg); z-index: 10; }
+  .dh { text-align: center; }
+  .dn { font-size: 12px; font-weight: 500; }
+  .dhr { font-size: 10px; color: var(--text2); margin-top: 1px; }
+  .gb { display: grid; grid-template-columns: 44px repeat(5, 1fr); }
+  .tc { position: relative; }
+  .tk { position: absolute; right: 4px; font-size: 9px; color: var(--text3); transform: translateY(-50%); white-space: nowrap; }
+  .dc { position: relative; border-left: 0.5px solid var(--border); }
+  .hl { position: absolute; left: 0; right: 0; height: 0.5px; background: var(--border2); pointer-events: none; }
+  .hhl { position: absolute; left: 0; right: 0; height: 0.5px; background: var(--border); pointer-events: none; }
+  .tb { position: absolute; left: 2px; right: 2px; border-radius: 6px; padding: 3px 6px; overflow: hidden; }
+  .bn { font-size: 10px; font-weight: 500; line-height: 1.25; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .bt { font-size: 9px; margin-top: 1px; opacity: 0.65; white-space: nowrap; overflow: hidden; }
 </style>
 </head>
 <body>
-
 <header>
-  <div>
-    <h1>Shift schedule — Clyde North McDonald's</h1>
-    <div class="header-sub">2:00 AM start · Wednesday to Sunday</div>
-  </div>
+  <h1>Shift schedule — Clyde North McDonald's</h1>
+  <div class="sub">2:00 AM start · Wednesday to Sunday</div>
 </header>
-
 <div class="legend">
-  <div class="legend-item"><div class="legend-dot" style="background:#C0DD97"></div>Bins / outdoor</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#B5D4F4"></div>Drive-Thru</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#F4C0D1"></div>Bathroom – public</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#ED93B1"></div>Bathroom – staff (full)</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#FBEAF0"></div>Bathroom – staff (sweep)</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#FAC775"></div>Dining area</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#D3D1C7"></div>Extra / walls</div>
+  <div class="li"><div class="ld" style="background:#639922"></div>Bins / outdoor</div>
+  <div class="li"><div class="ld" style="background:#378ADD"></div>Drive-Thru</div>
+  <div class="li"><div class="ld" style="background:#D4537E"></div>Bathroom – public</div>
+  <div class="li"><div class="ld" style="background:#ED93B1"></div>Bathroom – staff (full)</div>
+  <div class="li"><div class="ld" style="background:#F4C0D1"></div>Bathroom – staff (sweep)</div>
+  <div class="li"><div class="ld" style="background:#BA7517"></div>Dining area</div>
+  <div class="li"><div class="ld" style="background:#888780"></div>Extra / walls</div>
 </div>
-
-<div class="schedule-wrap">
-  <div class="grid-header">
+<div class="wrap">
+<div class="outer">
+  <div class="gh">
     <div></div>
-    <div class="day-header"><div class="day-name">Wed</div><div class="day-hours">2:00 – 6:30</div></div>
-    <div class="day-header"><div class="day-name">Thu</div><div class="day-hours">2:00 – 6:15</div></div>
-    <div class="day-header"><div class="day-name">Fri</div><div class="day-hours">2:00 – 6:30</div></div>
-    <div class="day-header"><div class="day-name">Sat</div><div class="day-hours">2:00 – 6:15</div></div>
-    <div class="day-header"><div class="day-name">Sun</div><div class="day-hours">2:00 – 5:30</div></div>
+    <div class="dh"><div class="dn">Wed</div><div class="dhr">2:00 – 6:30</div></div>
+    <div class="dh"><div class="dn">Thu</div><div class="dhr">2:00 – 6:15</div></div>
+    <div class="dh"><div class="dn">Fri</div><div class="dhr">2:00 – 6:30</div></div>
+    <div class="dh"><div class="dn">Sat</div><div class="dhr">2:00 – 6:15</div></div>
+    <div class="dh"><div class="dn">Sun</div><div class="dhr">2:00 – 5:30</div></div>
   </div>
-  <div class="grid-body" id="gridBody"></div>
+  <div class="gb" id="gb"></div>
 </div>
-
+</div>
 <script>
-const PX = 2.8;
-const START = 2 * 60;
-const END = 6 * 60 + 30;
+const PX = 3.2;
+const START = 120;
+const END = 390;
 const TOTAL = (END - START) * PX;
 
-const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-const COLORS = {
-  bins:      isDark ? { bg:'#27500A', fg:'#C0DD97' } : { bg:'#EAF3DE', fg:'#27500A' },
-  drivethru: isDark ? { bg:'#0C447C', fg:'#B5D4F4' } : { bg:'#E6F1FB', fg:'#0C447C' },
-  bathpub:   isDark ? { bg:'#72243E', fg:'#F4C0D1' } : { bg:'#FBEAF0', fg:'#72243E' },
-  bathstaff: isDark ? { bg:'#4B1528', fg:'#ED93B1' } : { bg:'#ED93B1', fg:'#4B1528' },
-  bathquick: isDark ? { bg:'#993556', fg:'#FBEAF0' } : { bg:'#FBEAF0', fg:'#993556' },
-  dining:    isDark ? { bg:'#633806', fg:'#FAC775' } : { bg:'#FAEEDA', fg:'#633806' },
-  extra:     isDark ? { bg:'#2C2C2A', fg:'#D3D1C7' } : { bg:'#F1EFE8', fg:'#444441' },
+const isDark = matchMedia('(prefers-color-scheme: dark)').matches;
+const C = {
+  bins:      isDark ? {bg:'#3B6D11',fg:'#C0DD97'} : {bg:'#EAF3DE',fg:'#3B6D11'},
+  drive:     isDark ? {bg:'#185FA5',fg:'#B5D4F4'} : {bg:'#E6F1FB',fg:'#185FA5'},
+  bathpub:   isDark ? {bg:'#993556',fg:'#F4C0D1'} : {bg:'#FBEAF0',fg:'#993556'},
+  bathstaff: isDark ? {bg:'#72243E',fg:'#ED93B1'} : {bg:'#ED93B1',fg:'#72243E'},
+  bathswp:   isDark ? {bg:'#4B1528',fg:'#F4C0D1'} : {bg:'#F4C0D1',fg:'#72243E'},
+  dining:    isDark ? {bg:'#854F0B',fg:'#FAC775'} : {bg:'#FAEEDA',fg:'#854F0B'},
+  extra:     isDark ? {bg:'#444441',fg:'#D3D1C7'} : {bg:'#F1EFE8',fg:'#5F5E5A'},
 };
 
-const WED_FRI = [
-  { name:'Empty & replace bins',         start:'2:00', end:'2:15', c:'bins' },
-  { name:'Wipe chairs & tables',         start:'2:15', end:'2:45', c:'dining' },
-  { name:'Carpark & Drive-Thru rubbish', start:'2:45', end:'2:55', c:'bins' },
-  { name:'Drive-Thru glass cleaning',    start:'2:55', end:'3:25', c:'drivethru' },
-  { name:'Bathroom – public',            start:'3:25', end:'3:45', c:'bathpub' },
-  { name:'Bathroom – staff',             start:'3:45', end:'4:00', c:'bathstaff' },
-  { name:'Bathroom mopping',             start:'4:00', end:'4:30', c:'bathpub' },
-  { name:'Dining area mopping',          start:'4:30', end:'5:30', c:'dining' },
-  { name:'Dining area glass cleaning',   start:'5:30', end:'6:00', c:'dining' },
-  { name:'Extra / walls',                start:'6:00', end:'6:30', c:'extra' },
+const WF = [
+  {n:'Empty & replace bins',        s:'2:00',e:'2:15',c:'bins'},
+  {n:'Wipe chairs & tables',        s:'2:15',e:'2:45',c:'dining'},
+  {n:'Carpark & Drive-Thru rubbish',s:'2:45',e:'2:55',c:'bins'},
+  {n:'Drive-Thru glass cleaning',   s:'2:55',e:'3:25',c:'drive'},
+  {n:'Bathroom – public',           s:'3:25',e:'3:45',c:'bathpub'},
+  {n:'Bathroom – staff',            s:'3:45',e:'4:00',c:'bathstaff'},
+  {n:'Bathroom mopping',            s:'4:00',e:'4:30',c:'bathpub'},
+  {n:'Dining area mopping',         s:'4:30',e:'5:30',c:'dining'},
+  {n:'Dining area glass cleaning',  s:'5:30',e:'6:00',c:'dining'},
+  {n:'Extra / walls',               s:'6:00',e:'6:30',c:'extra'},
 ];
-
-const THU_SAT = [
-  { name:'Empty & replace bins',         start:'2:00', end:'2:15', c:'bins' },
-  { name:'Wipe chairs & tables',         start:'2:15', end:'2:45', c:'dining' },
-  { name:'Carpark & Drive-Thru rubbish', start:'2:45', end:'2:55', c:'bins' },
-  { name:'Drive-Thru glass cleaning',    start:'2:55', end:'3:25', c:'drivethru' },
-  { name:'Bathroom – public',            start:'3:25', end:'3:45', c:'bathpub' },
-  { name:'Bathroom mopping',             start:'3:45', end:'4:15', c:'bathpub' },
-  { name:'Dining area mopping',          start:'4:15', end:'5:15', c:'dining' },
-  { name:'Dining area glass cleaning',   start:'5:15', end:'5:45', c:'dining' },
-  { name:'Extra / walls',                start:'5:45', end:'6:15', c:'extra' },
+const TS = [
+  {n:'Empty & replace bins',        s:'2:00',e:'2:15',c:'bins'},
+  {n:'Wipe chairs & tables',        s:'2:15',e:'2:45',c:'dining'},
+  {n:'Carpark & Drive-Thru rubbish',s:'2:45',e:'2:55',c:'bins'},
+  {n:'Drive-Thru glass cleaning',   s:'2:55',e:'3:25',c:'drive'},
+  {n:'Bathroom – public',           s:'3:25',e:'3:45',c:'bathpub'},
+  {n:'Bathroom mopping',            s:'3:45',e:'4:15',c:'bathpub'},
+  {n:'Dining area mopping',         s:'4:15',e:'5:15',c:'dining'},
+  {n:'Dining area glass cleaning',  s:'5:15',e:'5:45',c:'dining'},
+  {n:'Extra / walls',               s:'5:45',e:'6:15',c:'extra'},
 ];
-
-const SUN = [
-  { name:'Empty & replace bins',         start:'2:00', end:'2:15', c:'bins' },
-  { name:'Wipe chairs & tables',         start:'2:15', end:'2:45', c:'dining' },
-  { name:'Carpark & Drive-Thru rubbish', start:'2:45', end:'2:55', c:'bins' },
-  { name:'Drive-Thru glass cleaning',    start:'2:55', end:'3:25', c:'drivethru' },
-  { name:'Bathroom – public (full)',     start:'3:25', end:'3:45', c:'bathpub' },
-  { name:'Bathroom – staff (sweep)',     start:'3:45', end:'3:55', c:'bathquick' },
-  { name:'Bathroom mopping (public)',    start:'3:55', end:'4:10', c:'bathpub' },
-  { name:'Dining area mopping',          start:'4:10', end:'5:10', c:'dining' },
-  { name:'Dining area glass cleaning',   start:'5:10', end:'5:20', c:'dining' },
-  { name:'Extra / walls',                start:'5:20', end:'5:30', c:'extra' },
+const SN = [
+  {n:'Empty & replace bins',        s:'2:00',e:'2:15',c:'bins'},
+  {n:'Wipe chairs & tables',        s:'2:15',e:'2:45',c:'dining'},
+  {n:'Carpark & Drive-Thru rubbish',s:'2:45',e:'2:55',c:'bins'},
+  {n:'Drive-Thru glass cleaning',   s:'2:55',e:'3:25',c:'drive'},
+  {n:'Bathroom – public (full)',    s:'3:25',e:'3:45',c:'bathpub'},
+  {n:'Bathroom – staff (sweep)',    s:'3:45',e:'3:55',c:'bathswp'},
+  {n:'Bathroom mopping (public)',   s:'3:55',e:'4:10',c:'bathpub'},
+  {n:'Dining area mopping',         s:'4:10',e:'5:10',c:'dining'},
+  {n:'Dining area glass cleaning',  s:'5:10',e:'5:20',c:'dining'},
+  {n:'Extra / walls',               s:'5:20',e:'5:30',c:'extra'},
 ];
 
 const DAYS = [
-  { key:'wed', tasks: WED_FRI },
-  { key:'thu', tasks: THU_SAT },
-  { key:'fri', tasks: WED_FRI },
-  { key:'sat', tasks: THU_SAT },
-  { key:'sun', tasks: SUN },
+  {key:'wed',tasks:WF},{key:'thu',tasks:TS},
+  {key:'fri',tasks:WF},{key:'sat',tasks:TS},{key:'sun',tasks:SN}
 ];
 
-function toMins(t) { const [h,m] = t.split(':').map(Number); return h*60+m; }
-function fmt(t) {
-  const [h,m] = t.split(':').map(Number);
-  const s = h < 12 ? 'am' : 'pm';
-  const hd = h % 12 || 12;
-  return m === 0 ? `${hd}${s}` : `${hd}:${String(m).padStart(2,'0')}${s}`;
+function tm(t){const[h,m]=t.split(':').map(Number);return h*60+m;}
+function ft(t){
+  const[h,m]=t.split(':').map(Number);
+  const s=h<12?'am':'pm';const hd=h%12||12;
+  return m===0?`${hd}${s}`:`${hd}:${String(m).padStart(2,'0')}${s}`;
 }
 
-const body = document.getElementById('gridBody');
+const gb = document.getElementById('gb');
 
-const timeCol = document.createElement('div');
-timeCol.className = 'time-col';
-timeCol.style.cssText = `position:relative;height:${TOTAL}px;`;
-for (let m = START; m <= END; m += 60) {
-  const top = (m - START) * PX;
-  const tick = document.createElement('div');
-  tick.className = 'tick';
-  tick.style.top = top + 'px';
-  const h = m / 60;
-  tick.textContent = h < 12 ? `${h}am` : (h === 12 ? '12pm' : `${h-12}pm`);
-  timeCol.appendChild(tick);
+const tc = document.createElement('div');
+tc.className='tc';
+tc.style.cssText=`position:relative;height:${TOTAL}px;`;
+for(let m=START;m<=END;m+=60){
+  const top=(m-START)*PX;
+  const tk=document.createElement('div');
+  tk.className='tk';tk.style.top=top+'px';
+  const h=m/60;
+  tk.textContent=h<12?`${h}am`:(h===12?'12pm':`${h-12}pm`);
+  tc.appendChild(tk);
 }
-body.appendChild(timeCol);
+gb.appendChild(tc);
 
-DAYS.forEach(({ key, tasks }) => {
-  const dayCol = document.createElement('div');
-  dayCol.className = `day-col col-${key}`;
-  dayCol.style.cssText = `position:relative;height:${TOTAL}px;`;
+DAYS.forEach(({key,tasks})=>{
+  const dc=document.createElement('div');
+  dc.className=`dc col-${key}`;
+  dc.style.cssText=`position:relative;height:${TOTAL}px;`;
 
-  for (let m = START; m <= END; m += 60) {
-    const line = document.createElement('div');
-    line.className = 'hour-line';
-    line.style.top = ((m - START) * PX) + 'px';
-    dayCol.appendChild(line);
-    if (m < END) {
-      const half = document.createElement('div');
-      half.className = 'half-line';
-      half.style.top = ((m + 30 - START) * PX) + 'px';
-      dayCol.appendChild(half);
+  for(let m=START;m<=END;m+=60){
+    const hl=document.createElement('div');
+    hl.className='hl';hl.style.top=((m-START)*PX)+'px';
+    dc.appendChild(hl);
+    if(m<END){
+      const hhl=document.createElement('div');
+      hhl.className='hhl';hhl.style.top=((m+30-START)*PX)+'px';
+      dc.appendChild(hhl);
     }
   }
 
-  tasks.forEach(t => {
-    const sMin = toMins(t.start) - START;
-    const eMin = toMins(t.end) - START;
-    const dur = eMin - sMin;
-    const top = sMin * PX + 2;
-    const height = Math.max(dur * PX - 4, 14);
-    const c = COLORS[t.c];
+  tasks.forEach(t=>{
+    const sMin=tm(t.s)-START;
+    const eMin=tm(t.e)-START;
+    const dur=eMin-sMin;
+    const top=sMin*PX+1;
+    const height=Math.max(dur*PX-2,12);
+    const col=C[t.c];
 
-    const block = document.createElement('div');
-    block.className = 'task-block';
-    block.style.cssText = `top:${top}px;height:${height}px;background:${c.bg};color:${c.fg};`;
+    const tb=document.createElement('div');
+    tb.className='tb';
+    tb.style.cssText=`top:${top}px;height:${height}px;background:${col.bg};color:${col.fg};`;
 
-    const name = document.createElement('div');
-    name.className = 'block-name';
-    name.textContent = t.name;
-    block.appendChild(name);
+    const bn=document.createElement('div');
+    bn.className='bn';bn.textContent=t.n;
+    tb.appendChild(bn);
 
-    if (height > 22) {
-      const time = document.createElement('div');
-      time.className = 'block-time';
-      time.textContent = `${fmt(t.start)} – ${fmt(t.end)}`;
-      block.appendChild(time);
+    if(height>18){
+      const bt=document.createElement('div');
+      bt.className='bt';bt.textContent=`${ft(t.s)} – ${ft(t.e)}`;
+      tb.appendChild(bt);
     }
-
-    dayCol.appendChild(block);
+    dc.appendChild(tb);
   });
 
-  body.appendChild(dayCol);
+  gb.appendChild(dc);
 });
 </script>
 </body>
