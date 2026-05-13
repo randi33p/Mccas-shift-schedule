@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shift Schedule</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #ffffff;
+    --bg2: #f5f5f3;
+    --bg3: #eeede9;
+    --text: #1a1a18;
+    --text2: #6b6b67;
+    --text3: #9b9b96;
+    --border: rgba(0,0,0,0.1);
+    --border2: rgba(0,0,0,0.18);
+    --radius: 8px;
+    --radius-lg: 12px;
+    --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1c1a;
+      --bg2: #252523;
+      --bg3: #2e2e2b;
+      --text: #f0efe9;
+      --text2: #9b9b96;
+      --text3: #6b6b67;
+      --border: rgba(255,255,255,0.1);
+      --border2: rgba(255,255,255,0.18);
+    }
+    .col-wed .task-block { background: #3C3489; color: #CECBF6; }
+    .col-thu .task-block { background: #085041; color: #9FE1CB; }
+    .col-fri .task-block { background: #633806; color: #FAC775; }
+    .col-sat .task-block { background: #72243E; color: #F4C0D1; }
+    .col-sun .task-block { background: #0C447C; color: #B5D4F4; }
+  }
+
+  body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 24px; border-bottom: 0.5px solid var(--border);
+    background: var(--bg);
+  }
+  header h1 { font-size: 16px; font-weight: 500; }
+  .header-actions { display: flex; gap: 8px; }
+
+  button {
+    font-family: var(--font); font-size: 13px; cursor: pointer;
+    border: 0.5px solid var(--border2); border-radius: var(--radius);
+    background: transparent; color: var(--text); padding: 6px 12px;
+    transition: background 0.1s;
+  }
+  button:hover { background: var(--bg2); }
+  button.primary { background: var(--text); color: var(--bg); border-color: var(--text); }
+  button.primary:hover { opacity: 0.85; }
+  button.danger { color: #A32D2D; border-color: #F09595; }
+  button.danger:hover { background: #FCEBEB; }
+
+  .main { display: flex; height: calc(100vh - 53px); overflow: hidden; }
+
+  .sidebar {
+    width: 260px; min-width: 260px; border-right: 0.5px solid var(--border);
+    padding: 16px; overflow-y: auto; background: var(--bg);
+  }
+  .sidebar h2 { font-size: 12px; font-weight: 500; color: var(--text2); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
+
+  .task-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+  .task-item {
+    background: var(--bg2); border-radius: var(--radius); padding: 10px 12px;
+    border: 0.5px solid var(--border); cursor: pointer; transition: border-color 0.1s;
+  }
+  .task-item:hover { border-color: var(--border2); }
+  .task-item.selected { border-color: var(--text); }
+  .task-item-name { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+  .task-item-time { font-size: 11px; color: var(--text2); }
+
+  .edit-panel {
+    background: var(--bg2); border-radius: var(--radius-lg); padding: 14px;
+    border: 0.5px solid var(--border); margin-top: 8px;
+  }
+  .edit-panel h3 { font-size: 12px; font-weight: 500; color: var(--text2); margin-bottom: 10px; }
+  .field { margin-bottom: 10px; }
+  .field label { font-size: 11px; color: var(--text2); display: block; margin-bottom: 4px; }
+  .field input {
+    width: 100%; font-family: var(--font); font-size: 13px;
+    background: var(--bg); color: var(--text); border: 0.5px solid var(--border2);
+    border-radius: var(--radius); padding: 6px 10px; outline: none;
+  }
+  .field input:focus { border-color: var(--text); }
+  .edit-actions { display: flex; gap: 6px; margin-top: 12px; }
+  .edit-actions button { flex: 1; font-size: 12px; }
+
+  .schedule-wrap { flex: 1; overflow: auto; padding: 16px 20px; }
+
+  .grid-header {
+    display: grid;
+    grid-template-columns: 52px repeat(5, 1fr);
+    gap: 0; margin-bottom: 0;
+    position: sticky; top: 0; background: var(--bg); z-index: 10;
+    border-bottom: 0.5px solid var(--border);
+    padding-bottom: 8px; margin-bottom: 4px;
+  }
+  .day-label {
+    font-size: 12px; font-weight: 500; color: var(--text2);
+    text-align: center; padding: 4px 0;
+  }
+  .day-label.empty { }
+
+  .grid-body { display: grid; grid-template-columns: 52px repeat(5, 1fr); gap: 0; }
+
+  .time-col { position: relative; }
+  .tick {
+    position: absolute; right: 8px; font-size: 11px; color: var(--text3);
+    transform: translateY(-50%); white-space: nowrap;
+  }
+
+  .day-col { position: relative; border-left: 0.5px solid var(--border); }
+  .hour-line {
+    position: absolute; left: 0; right: 0; height: 0.5px;
+    background: var(--border); pointer-events: none;
+  }
+
+  .task-block {
+    position: absolute; left: 3px; right: 3px;
+    border-radius: var(--radius); padding: 5px 8px;
+    cursor: pointer; transition: opacity 0.15s, outline 0.1s;
+    overflow: hidden;
+  }
+  .task-block:hover { opacity: 0.85; }
+  .task-block.selected { outline: 2px solid var(--text); outline-offset: 1px; }
+
+  .col-wed .task-block { background: #CECBF6; color: #3C3489; }
+  .col-thu .task-block { background: #9FE1CB; color: #085041; }
+  .col-fri .task-block { background: #FAC775; color: #633806; }
+  .col-sat .task-block { background: #F4C0D1; color: #72243E; }
+  .col-sun .task-block { background: #B5D4F4; color: #0C447C; }
+
+  .block-name { font-size: 11px; font-weight: 500; line-height: 1.3; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .block-time { font-size: 10px; margin-top: 2px; opacity: 0.7; }
+
+  .modal-backdrop {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.4); z-index: 100;
+    align-items: center; justify-content: center;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal {
+    background: var(--bg); border-radius: var(--radius-lg);
+    border: 0.5px solid var(--border2); padding: 20px;
+    width: 320px; max-width: 90vw;
+  }
+  .modal h2 { font-size: 15px; font-weight: 500; margin-bottom: 16px; }
+  .modal .field { margin-bottom: 12px; }
+  .modal-actions { display: flex; gap: 8px; margin-top: 16px; }
+  .modal-actions button { flex: 1; }
+
+  .add-task-btn {
+    width: 100%; font-size: 12px; padding: 8px;
+    border-style: dashed; color: var(--text2);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Shift schedule — Clyde North McDonald's</h1>
+  <div class="header-actions">
+    <button onclick="openAddModal()">+ Add task</button>
+    <button class="primary" onclick="exportData()">Export JSON</button>
+  </div>
+</header>
+
+<div class="main">
+  <div class="sidebar">
+    <h2>Tasks</h2>
+    <div class="task-list" id="taskList"></div>
+    <button class="add-task-btn" onclick="openAddModal()">+ Add task</button>
+
+    <div class="edit-panel" id="editPanel" style="display:none;">
+      <h3>Edit task</h3>
+      <div class="field">
+        <label>Task name</label>
+        <input type="text" id="editName" />
+      </div>
+      <div class="field">
+        <label>Start time</label>
+        <input type="time" id="editStart" />
+      </div>
+      <div class="field">
+        <label>End time</label>
+        <input type="time" id="editEnd" />
+      </div>
+      <div class="edit-actions">
+        <button class="primary" onclick="saveEdit()">Save</button>
+        <button class="danger" onclick="deleteSelected()">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="schedule-wrap">
+    <div class="grid-header">
+      <div class="day-label empty"></div>
+      <div class="day-label">Wed</div>
+      <div class="day-label">Thu</div>
+      <div class="day-label">Fri</div>
+      <div class="day-label">Sat</div>
+      <div class="day-label">Sun</div>
+    </div>
+    <div class="grid-body" id="gridBody"></div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="addModal">
+  <div class="modal">
+    <h2>Add task</h2>
+    <div class="field">
+      <label>Task name</label>
+      <input type="text" id="addName" placeholder="e.g. Empty bins" />
+    </div>
+    <div class="field">
+      <label>Start time</label>
+      <input type="time" id="addStart" value="02:00" />
+    </div>
+    <div class="field">
+      <label>End time</label>
+      <input type="time" id="addEnd" value="02:30" />
+    </div>
+    <div class="modal-actions">
+      <button onclick="closeAddModal()">Cancel</button>
+      <button class="primary" onclick="confirmAdd()">Add task</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const PX_PER_MIN = 2.4;
+const DAYS = ['wed','thu','fri','sat','sun'];
+const DAY_LABELS = ['Wednesday','Thursday','Friday','Saturday','Sunday'];
+
+let tasks = [
+  { id: 1, name: "Empty & replace bins",          start: "02:00", end: "02:30" },
+  { id: 2, name: "Wipe chairs & tables",          start: "02:30", end: "03:00" },
+  { id: 3, name: "Carpark & Drive-Thru rubbish",  start: "03:00", end: "03:30" },
+  { id: 4, name: "Drive-Thru glass cleaning",     start: "03:30", end: "04:00" },
+  { id: 5, name: "Bathroom cleaning",             start: "04:00", end: "04:30" },
+  { id: 6, name: "Bathroom mopping",              start: "04:30", end: "05:00" },
+  { id: 7, name: "Dining area mopping",           start: "05:00", end: "05:30" },
+  { id: 8, name: "Dining area glass cleaning",    start: "05:30", end: "06:00" },
+];
+
+let selectedId = null;
+let nextId = 9;
+
+function toMins(t) {
+  const [h,m] = t.split(":").map(Number);
+  return h * 60 + m;
+}
+
+function fmtTime(t) {
+  const [h,m] = t.split(":").map(Number);
+  const s = h < 12 ? "am" : "pm";
+  const hd = h % 12 || 12;
+  return m === 0 ? `${hd}${s}` : `${hd}:${String(m).padStart(2,"0")}${s}`;
+}
+
+function getScheduleBounds() {
+  if (!tasks.length) return { startMins: 120, endMins: 360 };
+  const starts = tasks.map(t => toMins(t.start));
+  const ends = tasks.map(t => toMins(t.end));
+  const minS = Math.min(...starts);
+  const maxE = Math.max(...ends);
+  const startH = Math.floor(minS / 60);
+  const endH = Math.ceil(maxE / 60);
+  return { startMins: startH * 60, endMins: endH * 60 };
+}
+
+function render() {
+  renderSidebar();
+  renderGrid();
+}
+
+function renderSidebar() {
+  const list = document.getElementById('taskList');
+  list.innerHTML = '';
+  tasks.forEach(t => {
+    const el = document.createElement('div');
+    el.className = 'task-item' + (t.id === selectedId ? ' selected' : '');
+    el.innerHTML = `<div class="task-item-name">${t.name}</div><div class="task-item-time">${fmtTime(t.start)} – ${fmtTime(t.end)}</div>`;
+    el.onclick = () => selectTask(t.id);
+    list.appendChild(el);
+  });
+
+  const panel = document.getElementById('editPanel');
+  if (selectedId) {
+    const t = tasks.find(x => x.id === selectedId);
+    if (t) {
+      document.getElementById('editName').value = t.name;
+      document.getElementById('editStart').value = t.start;
+      document.getElementById('editEnd').value = t.end;
+      panel.style.display = 'block';
+    }
+  } else {
+    panel.style.display = 'none';
+  }
+}
+
+function renderGrid() {
+  const body = document.getElementById('gridBody');
+  body.innerHTML = '';
+  const { startMins, endMins } = getScheduleBounds();
+  const totalMins = endMins - startMins;
+  const totalH = totalMins * PX_PER_MIN;
+
+  const timeCol = document.createElement('div');
+  timeCol.className = 'time-col';
+  timeCol.style.height = totalH + 'px';
+  timeCol.style.position = 'relative';
+
+  for (let m = startMins; m <= endMins; m += 60) {
+    const top = (m - startMins) * PX_PER_MIN;
+    const tick = document.createElement('div');
+    tick.className = 'tick';
+    tick.style.top = top + 'px';
+    const h = m / 60;
+    tick.textContent = h < 12 ? `${h}am` : (h === 12 ? '12pm' : `${h-12}pm`);
+    timeCol.appendChild(tick);
+  }
+  body.appendChild(timeCol);
+
+  DAYS.forEach((day, di) => {
+    const col = document.createElement('div');
+    col.className = `day-col col-${day}`;
+    col.style.height = totalH + 'px';
+    col.style.position = 'relative';
+
+    for (let m = startMins; m <= endMins; m += 60) {
+      const line = document.createElement('div');
+      line.className = 'hour-line';
+      line.style.top = ((m - startMins) * PX_PER_MIN) + 'px';
+      col.appendChild(line);
+    }
+
+    tasks.forEach(t => {
+      const sMin = toMins(t.start) - startMins;
+      const eMin = toMins(t.end) - startMins;
+      const dur = eMin - sMin;
+      const top = sMin * PX_PER_MIN + 2;
+      const height = dur * PX_PER_MIN - 4;
+
+      const block = document.createElement('div');
+      block.className = 'task-block' + (t.id === selectedId ? ' selected' : '');
+      block.style.top = top + 'px';
+      block.style.height = Math.max(height, 20) + 'px';
+      block.onclick = () => selectTask(t.id);
+
+      const name = document.createElement('div');
+      name.className = 'block-name';
+      name.textContent = t.name;
+
+      const time = document.createElement('div');
+      time.className = 'block-time';
+      time.textContent = `${fmtTime(t.start)} – ${fmtTime(t.end)}`;
+
+      block.appendChild(name);
+      if (height > 28) block.appendChild(time);
+      col.appendChild(block);
+    });
+
+    body.appendChild(col);
+  });
+}
+
+function selectTask(id) {
+  selectedId = selectedId === id ? null : id;
+  render();
+}
+
+function saveEdit() {
+  const t = tasks.find(x => x.id === selectedId);
+  if (!t) return;
+  t.name = document.getElementById('editName').value.trim() || t.name;
+  t.start = document.getElementById('editStart').value;
+  t.end = document.getElementById('editEnd').value;
+  tasks.sort((a,b) => toMins(a.start) - toMins(b.start));
+  render();
+}
+
+function deleteSelected() {
+  if (!selectedId) return;
+  if (!confirm('Delete this task?')) return;
+  tasks = tasks.filter(t => t.id !== selectedId);
+  selectedId = null;
+  render();
+}
+
+function openAddModal() {
+  document.getElementById('addModal').classList.add('open');
+  document.getElementById('addName').focus();
+}
+
+function closeAddModal() {
+  document.getElementById('addModal').classList.remove('open');
+}
+
+function confirmAdd() {
+  const name = document.getElementById('addName').value.trim();
+  const start = document.getElementById('addStart').value;
+  const end = document.getElementById('addEnd').value;
+  if (!name || !start || !end) return;
+  tasks.push({ id: nextId++, name, start, end });
+  tasks.sort((a,b) => toMins(a.start) - toMins(b.start));
+  closeAddModal();
+  render();
+}
+
+function exportData() {
+  const blob = new Blob([JSON.stringify(tasks, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'shift-schedule.json';
+  a.click();
+}
+
+document.getElementById('addModal').addEventListener('click', function(e) {
+  if (e.target === this) closeAddModal();
+});
+
+render();
+</script>
+</body>
+</html>
